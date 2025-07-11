@@ -1,0 +1,13 @@
+{
+  "dockerfile_lines": [],
+  "graphs": {
+    "task_maistro": "modules.task_maistro:graph"
+  },
+  "python_version": "3.11",
+  "dependencies": [
+    "."
+  ],
+  "env": {
+    "PYTHONPATH": "."
+  }
+}

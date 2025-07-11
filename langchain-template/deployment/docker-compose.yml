@@ -1,0 +1,59 @@
+volumes:
+  langgraph-data:
+    driver: local
+services:
+  langgraph-redis:
+    image: redis:6
+    healthcheck:
+      test: redis-cli ping
+      start_period: 5s
+      interval: 300s
+      timeout: 1s
+      retries: 5
+    ports:
+      - "6379:6379"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "10"
+  langgraph-postgres:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - langgraph-data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U postgres
+      start_period: 5s
+      timeout: 1s
+      retries: 5
+      interval: 300s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "10"
+  langgraph-api:
+    image: "langgraph-api-server"
+    ports:
+      - "8123:8000"
+    depends_on:
+      langgraph-redis:
+        condition: service_healthy
+      langgraph-postgres:
+        condition: service_healthy
+    environment:
+      REDIS_URI: redis://langgraph-redis:6379
+      OPENAI_API_KEY: "...your OpenAI API key here..."
+      LANGSMITH_API_KEY: "...your LangSmith API key here..."
+      POSTGRES_URI: postgres://postgres:postgres@langgraph-postgres:5432/postgres?sslmode=disable
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "10"
