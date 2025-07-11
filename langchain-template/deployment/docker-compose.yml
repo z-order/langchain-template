@@ -49,8 +49,8 @@ services:
         condition: service_healthy
     environment:
       REDIS_URI: redis://langgraph-redis:6379
-      OPENAI_API_KEY: "...your OpenAI API key here..."
-      LANGSMITH_API_KEY: "...your LangSmith API key here..."
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      LANGSMITH_API_KEY: ${LANGSMITH_API_KEY}
       POSTGRES_URI: postgres://postgres:postgres@langgraph-postgres:5432/postgres?sslmode=disable
     logging:
       driver: "json-file"
